@@ -10,7 +10,7 @@ Vagrant.configure("2") do |config|
       echo "$IP_NW$((IP_START+2)) worker-node02" >> /etc/hosts
   SHELL
 
-  config.vm.box = "bento/ubuntu-22.04"
+  config.vm.box = "ubuntu/focal64"
   config.vm.box_check_update = true
 
   config.vm.define "master" do |master|
@@ -18,8 +18,8 @@ Vagrant.configure("2") do |config|
     master.vm.hostname = "master-node"
     master.vm.network "private_network", ip: IP_NW + "#{IP_START}"
     master.vm.provider "virtualbox" do |vb|
-        vb.memory = 4048
-        vb.cpus = 2
+        vb.memory = 2048
+        vb.cpus = 1
     end
     master.vm.provision "shell", path: "scripts/common.sh"
     master.vm.provision "shell", path: "scripts/master.sh"
@@ -27,16 +27,15 @@ Vagrant.configure("2") do |config|
 
   (1..NUM_WORKER_NODES).each do |i|
 
-  config.vm.define "node0#{i}" do |node|
-    node.vm.hostname = "worker-node0#{i}"
-    node.vm.network "private_network", ip: IP_NW + "#{IP_START + i}"
-    node.vm.provider "virtualbox" do |vb|
-        vb.memory = 2048
-        vb.cpus = 1
+    config.vm.define "node0#{i}" do |node|
+      node.vm.hostname = "worker-node0#{i}"
+      node.vm.network "private_network", ip: IP_NW + "#{IP_START + i}"
+      node.vm.provider "virtualbox" do |vb|
+          vb.memory = 1024
+          vb.cpus = 1
+      end
+      node.vm.provision "shell", path: "scripts/common.sh"
+      node.vm.provision "shell", path: "scripts/node.sh"
     end
-    node.vm.provision "shell", path: "scripts/common.sh"
-    node.vm.provision "shell", path: "scripts/node.sh"
   end
-
-  end
-end 
+end
